@@ -24,9 +24,6 @@ utils/tensors.py
 utils/weight_init.py
 utils/weight_clipper.py
 scripts
-outer/models/former
-outer/models/raster_generator.py
-outer/models/rnn_generator.py
 outer/*.svg
 outer/*.png
 repair_all_bash_scripts_to_linux.sh
