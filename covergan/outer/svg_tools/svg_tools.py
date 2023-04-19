@@ -189,7 +189,7 @@ def create_pentagon(center: torch.Tensor, big_rad: torch.Tensor, rotationAngle: 
 
 def create_rand_fig(center: torch.Tensor, big_rad: torch.Tensor, rotationAngle: torch.Tensor,
                     path_depth: int, deformation: torch.Tensor = None):
-    rand_func = random.choice([init_func_types_config[x][0]
+    rand_func = random.choice([init_func_types_config[x].base_function
                                for x in init_func_types_config
                                if init_func_types_config[x] is not InitFuncType.RAND])
     return rand_func(center, big_rad, rotationAngle, path_depth, deformation)

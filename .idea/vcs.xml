@@ -2,12 +2,14 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/CoverGAN-izharsky" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/covergan" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/diffvg" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/diffvg/pybind11" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/diffvg/pybind11/tools/clang" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/diffvg/thrust" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/diffvg/thrust/dependencies/cub" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/oev_background_emotion" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/pixray" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/pixray/SLIP" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/pixray/v-diffusion-pytorch" vcs="Git" />

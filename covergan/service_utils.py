@@ -34,8 +34,8 @@ def color_to_rgb_attr(color):
 
 def add_filter(image: SVGContainer, f: OverlayFilter):
     rect = RectTag(attrs_dict={"x": 0, "y": 0,
-                               "width": image.width,
-                               "height": image.height,
+                               "width": image[0],
+                               "height": image[1],
                                })
     image.add_inner_node(rect)
 
@@ -52,9 +52,9 @@ def add_filter(image: SVGContainer, f: OverlayFilter):
         radial_gradient.add_stop(0, color_to_rgba_attr([0, 0, 0, 0]))
         radial_gradient.add_stop(0.7, color_to_rgba_attr([0, 0, 0, 0]))
         radial_gradient.add_stop(1, color_to_rgba_attr([0, 0, 0, 153]))
-        radial_gradient.add_attrs({"cx": image.width // 2,
-                                   "cy": image.height // 2,
-                                   "r": math.ceil(image.width / math.sqrt(2)),
+        radial_gradient.add_attrs({"cx": image[0] // 2,
+                                   "cy": image[1]// 2,
+                                   "r": math.ceil(image[0] / math.sqrt(2)),
                                    "gradientUnits": "userSpaceOnUse",
                                    "spreadMethod": "pad"})
         image.bind_tags_with_id(rect, radial_gradient, "fill")

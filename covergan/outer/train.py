@@ -244,21 +244,21 @@ def train(dataloader: DataLoader, test_dataloader: DataLoader,
                 # Getting fake shapes, same as in the loop above
                 fake_cover_tensor, disc_fake_pred, fig_params = get_fake_pred(should_detach=False)
 
-                # p_dist = torch.nn.PairwiseDistance()
-                # dist_loss_sum = torch.tensor(0.0).to(fake_cover_tensor.device)
-                # for figs in fig_params:
-                #     cur_batch_dist_loss = torch.tensor(0.0).to(fake_cover_tensor.device)
-                #     for ind_x, x in enumerate(figs):
-                #         for ind_y in range(ind_x + 1, len(figs)):
-                #             a = x["center_point"]
-                #             b = figs[ind_y]["center_point"]
-                #             cur_batch_dist_loss += 50000 / (p_dist(a, b)) ** 3
-                #     dist_loss_sum += cur_batch_dist_loss / len(figs)
-                #
-                # dist_loss_sum = dist_loss_sum / len(fig_params)
-                # dist_loss_sum.backward()
-                # gen_loss = -disc_fake_pred.mean() + dist_loss_sum
-                gen_loss = -disc_fake_pred.mean()
+                p_dist = torch.nn.PairwiseDistance()
+                dist_loss_sum = torch.tensor(0.0).to(fake_cover_tensor.device)
+                for figs in fig_params:
+                    cur_batch_dist_loss = torch.tensor(0.0).to(fake_cover_tensor.device)
+                    for ind_x, x in enumerate(figs):
+                        for ind_y in range(ind_x + 1, len(figs)):
+                            a = x["center_point"]
+                            b = figs[ind_y]["center_point"]
+                            cur_batch_dist_loss += 50000 / (p_dist(a, b)) ** 3
+                    dist_loss_sum += cur_batch_dist_loss / len(figs)
+
+                dist_loss_sum = dist_loss_sum / len(fig_params)
+                dist_loss_sum.backward()
+                gen_loss = -disc_fake_pred.mean() + dist_loss_sum
+                # gen_loss = -disc_fake_pred.mean()
                 gen_loss.backward()
                 if plot_grad:
                     plot_grad_flow(gen.named_parameters(), "generator", epoch=epoch, cur_step=cur_step)
