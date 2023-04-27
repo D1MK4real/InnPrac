@@ -24,7 +24,7 @@ class MyGeneratorFixedSixFigs32Good(nn.Module):
         self.radius_coef = 0.45
         self.deform_coef = 0.25
 
-        self.USE_ATTN = False
+        self.USE_ATTN = True
         self.NEED_STROKE = False
         self.USE_PALETTE_PREDICTOR = True
 

@@ -2,6 +2,7 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/BinaryNet.pytorch" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/CoverGAN-izharsky" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/covergan" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/diffvg" vcs="Git" />
