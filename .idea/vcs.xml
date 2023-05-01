@@ -4,6 +4,11 @@
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/CoverGAN-izharsky" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/covergan" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/diffvg2022" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/diffvg2022/pybind11" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/diffvg2022/pybind11/tools/clang" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/diffvg2022/thrust" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/diffvg2022/thrust/dependencies/cub" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/oev_background_emotion" vcs="Git" />
   </component>
 </project>
