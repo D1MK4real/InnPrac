@@ -47,9 +47,9 @@ class Discriminator(torch.nn.Module):
 
         in_features = layers[-3].out_channels + audio_embedding_dim
         layers = [
-            nn.Linear(in_features=in_features, out_features=1)
+            nn.Linear(in_features=in_features, out_features=1),
+            nn.Sigmoid()
         ]
-        self.adv_layer = torch.nn.Sequential(*layers)
         self.adv_layer = torch.nn.Sequential(*layers)
 
     def forward(self, img: torch.Tensor, audio_embedding: torch.Tensor) -> torch.Tensor:
