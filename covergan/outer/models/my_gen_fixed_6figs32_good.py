@@ -46,6 +46,8 @@ class MyGeneratorFixedSixFigs32Good(nn.Module):
             for ind, conf in enumerate(self.figs_config)
         ]
 
+        self.emb = nn.Embedding(audio_embedding_dim, audio_embedding_dim)
+
         addable_count = 0
         if self.NEED_STROKE:
             self.stroke_width_count = 1
@@ -63,19 +65,15 @@ class MyGeneratorFixedSixFigs32Good(nn.Module):
                   + len(self.all_points_count_for_each_fig) * addable_count
 
         out_features = out_dim
-        feature_step = (in_features - out_features) // num_layers
+        layer_dims = [in_features, 256, 512, 1024]
         layers = []
-        for i in range(num_layers - 1):
-            out_features = in_features - feature_step
+        for i in range(len(layer_dims)):
             layers += [
-                torch.nn.Linear(in_features=in_features, out_features=out_features),
-                torch.nn.BatchNorm1d(num_features=out_features),
-                # torch.nn.LeakyReLU(0.2),
-                torch.nn.ELU(),
+                torch.nn.Linear(in_features=layer_dims[i], out_features=layer_dims[i + 1]),
+                torch.nn.LeakyReLU(0.2),
             ]
-            in_features = out_features
         layers += [
-            torch.nn.Linear(in_features=in_features, out_features=out_dim),
+            torch.nn.Linear(in_features=layer_dims[-1], out_features=out_features),
             torch.nn.Tanh()
         ]
         my_layers = layers
@@ -177,6 +175,7 @@ class MyGeneratorFixedSixFigs32Good(nn.Module):
 
     def fwd_func(self, noise: torch.Tensor, audio_embedding: torch.Tensor):
 
+        audio_embedding = self.emb(audio_embedding.argmax(dim=1))
         no_random_inp = audio_embedding
         if self.USE_ATTN:
             no_random_inp = self.trans(torch.unsqueeze(no_random_inp, 0))[0]
