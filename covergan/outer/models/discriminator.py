@@ -1,5 +1,5 @@
 from typing import Optional
-
+import torch.nn as nn
 import torch
 from torchvision.transforms.functional import gaussian_blur
 
@@ -25,57 +25,38 @@ class Discriminator(torch.nn.Module):
         conv_padding = 1
         ds_size = canvas_size
 
-        for i in range(num_conv_layers):
-            # Dimensions of the downsampled image
-            ds_size = (ds_size + 2 * conv_padding - conv_kernel_size) // conv_stride + 1
+        self.emb = nn.Embedding(audio_embedding_dim, audio_embedding_dim)
 
-            layers += [
-                torch.nn.Conv2d(
-                    in_channels=in_channels, out_channels=out_channels,
-                    kernel_size=conv_kernel_size,
-                    stride=conv_stride,
-                    padding=conv_padding,
-                    bias=False
-                ),
-                torch.nn.LayerNorm([ds_size, ds_size]),
-                # torch.nn.LeakyReLU(0.1),
-                torch.nn.ELU(),
-            ]
-
-            in_channels = out_channels
-            if double_channels:
-                out_channels *= 2
-                double_channels = False
-            else:
-                double_channels = True
-            conv_kernel_size = max(conv_kernel_size - 1, 3)
-            conv_stride = max(conv_stride - 1, 2)
+        layers = [
+            nn.Conv2d(3, 32, 3, 2, padding=1),
+            nn.LeakyReLU(0.2),
+            nn.Conv2d(32, 64, 3, 2, padding=1),
+            nn.BatchNorm2d(64),
+            nn.LeakyReLU(0.2),
+            nn.Conv2d(64, 64, 3, 2, padding=1),
+            nn.BatchNorm2d(64),
+            nn.Conv2d(64, 32, 3, 2, padding=1),
+            nn.AdaptiveAvgPool2d(output_size=1),
+            nn.Sigmoid()
+        ]
 
         self.model = torch.nn.Sequential(*layers)
 
-        out_channels //= 2  # Output channels of the last Conv2d
-        img_dim = out_channels * (ds_size ** 2)
+        # out_channels //= 2  # Output channels of the last Conv2d
+        # img_dim = out_channels * (ds_size ** 2)
 
-        in_features = img_dim + audio_embedding_dim
-        layers = []
-        for i in range(num_linear_layers - 1):
-            out_features = in_features // 64
-            layers += [
-                torch.nn.Linear(in_features=in_features, out_features=out_features),
-                # torch.nn.LeakyReLU(0.2),
-                torch.nn.ELU(),
-                # torch.nn.Dropout2d(0.2)
-            ]
-            in_features = out_features
-        layers += [
-            torch.nn.Linear(in_features=in_features, out_features=1)
+        in_features = layers[-3].out_channels + audio_embedding_dim
+        layers = [
+            nn.Linear(in_features=in_features, out_features=1)
         ]
+        self.adv_layer = torch.nn.Sequential(*layers)
         self.adv_layer = torch.nn.Sequential(*layers)
 
     def forward(self, img: torch.Tensor, audio_embedding: torch.Tensor) -> torch.Tensor:
         transformed_img = transform_img_for_disc(img)
         output = self.model(transformed_img)
         output = output.reshape(output.shape[0], output.shape[1]*output.shape[2]*output.shape[3])  # Flatten elements in the batch
+        audio_embedding = self.emb(audio_embedding.argmax(dim=1))
         inp = torch.cat((output, audio_embedding), dim=1)
         validity = self.adv_layer(inp)
         assert not torch.any(torch.isnan(validity))

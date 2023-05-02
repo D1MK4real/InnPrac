@@ -60,8 +60,8 @@ class MyDiscriminator(torch.nn.Module):
 
         self.model = torch.nn.Sequential(*layers)
 
-        if has_emotions:
-            in_features += len(Emotion)
+        # if has_emotions:
+        #     in_features += len(Emotion)
         # for i in range(num_linear_layers - 1):
         #     out_features = in_features // 64
         #     layers += [

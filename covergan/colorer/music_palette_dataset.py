@@ -196,6 +196,7 @@ class PaletteDataset(Dataset[Tuple[torch.Tensor, torch.Tensor]]):
         emotions = self.data.iloc[index]['emotion']
 
         emotion_tensor = np.zeros(9, dtype=np.float32)
+
         for emotion in emotions.split(','):
             emotion_tensor[self.emotions[emotion]] = 1
         emotion_tensor = torch.Tensor(emotion_tensor)
@@ -450,7 +451,7 @@ class ImageDatasetSmiles(Dataset[Tuple[torch.Tensor, torch.Tensor]]):
 
         name = self.data.iloc[index]['image']
         image = PIL.Image.open(os.path.join(self.cover_dir_, name)).convert("RGB")
-        image = image.resize((400, 400))
+        image = image.resize((128, 128))
         emotions = self.data.iloc[index]['label']
 
         emotion_tensor = np.zeros(7, dtype=np.float32)
