@@ -571,7 +571,7 @@ class ImageDataset(Dataset[Tuple[torch.Tensor, torch.Tensor]]):
         name = self.data.iloc[index]['painting']
         image = cv2.imread(os.path.join(self.cover_dir_, art_style, name + ".jpg"))
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        image = cv2.resize(image, (400, 400))
+        image = cv2.resize(image, (128, 128))
         emotions = self.data.iloc[index]['emotion']
 
         emotion_tensor = np.zeros(9, dtype=np.float32)
