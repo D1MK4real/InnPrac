@@ -1,5 +1,6 @@
 from typing import *
 
+import torch.nn
 from torch import nn
 
 from .cover_classes import *
@@ -74,7 +75,7 @@ class MyGeneratorFixedSixFigs32Good(nn.Module):
             ]
         layers += [
             torch.nn.Linear(in_features=layer_dims[-1], out_features=out_features),
-            torch.nn.Sigmoid()
+            torch.nn.Tanh()
         ]
         my_layers = layers
 
