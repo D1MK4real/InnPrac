@@ -30,14 +30,13 @@ class Discriminator(torch.nn.Module):
         layers = [
             nn.Conv2d(3, 32, 3, 2, padding=1),
             nn.LeakyReLU(0.2),
+            nn.Dropout(),
             nn.Conv2d(32, 64, 3, 2, padding=1),
             nn.BatchNorm2d(64),
-            nn.LeakyReLU(0.2),
-            nn.Conv2d(64, 64, 3, 2, padding=1),
-            nn.BatchNorm2d(64),
-            nn.Conv2d(64, 32, 3, 2, padding=1),
-            nn.AdaptiveAvgPool2d(output_size=1),
-            nn.Sigmoid()
+            nn.AdaptiveAvgPool2d(1),
+            nn.Flatten(),
+            nn.Linear(64, 32),
+            nn.Sigmoid(),
         ]
 
         self.model = torch.nn.Sequential(*layers)
@@ -45,9 +44,9 @@ class Discriminator(torch.nn.Module):
         # out_channels //= 2  # Output channels of the last Conv2d
         # img_dim = out_channels * (ds_size ** 2)
 
-        in_features = layers[-3].out_channels + audio_embedding_dim
+        # in_features = layers[-3].out_channels + audio_embedding_dim
         layers = [
-            nn.Linear(in_features=in_features, out_features=1),
+            nn.Linear(in_features=32+audio_embedding_dim, out_features=1),
             nn.Sigmoid()
         ]
         self.adv_layer = torch.nn.Sequential(*layers)
@@ -55,7 +54,7 @@ class Discriminator(torch.nn.Module):
     def forward(self, img: torch.Tensor, audio_embedding: torch.Tensor) -> torch.Tensor:
         transformed_img = transform_img_for_disc(img)
         output = self.model(transformed_img)
-        output = output.reshape(output.shape[0], output.shape[1]*output.shape[2]*output.shape[3])  # Flatten elements in the batch
+        # output = output.reshape(output.shape[0], output.shape[1]*output.shape[2]*output.shape[3])  # Flatten elements in the batch
         audio_embedding = self.emb(audio_embedding.argmax(dim=1))
         inp = torch.cat((output, audio_embedding), dim=1)
         validity = self.adv_layer(inp)

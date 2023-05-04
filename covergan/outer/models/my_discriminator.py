@@ -72,9 +72,9 @@ class MyDiscriminator(torch.nn.Module):
         # layers += [
         #     torch.nn.Linear(in_features=in_features, out_features=1)
         # ]
-        in_features = layers[-3].out_channels + audio_embedding_dim
+        # in_features = layers[-3].out_channels + audio_embedding_dim
         layers = [
-            nn.Linear(in_features=in_features, out_features=1)
+            nn.Linear(in_features=32+audio_embedding_dim, out_features=1)
         ]
         self.adv_layer = torch.nn.Sequential(*layers)
 
@@ -82,7 +82,7 @@ class MyDiscriminator(torch.nn.Module):
                 emotions: Optional[torch.Tensor]) -> torch.Tensor:
         transformed_img = transform_img_for_disc(img)
         output = self.model(transformed_img)
-        output = output.reshape(output.shape[0], -1)  # Flatten elements in the batch
+        # output = output.reshape(output.shape[0], -1)  # Flatten elements in the batch
         if emotions is None:
             validity = self.adv_layer(torch.cat((output, self.emb(audio_embedding.argmax(dim=1))), dim=1))
         else:
