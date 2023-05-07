@@ -66,7 +66,7 @@ class MyGeneratorFixedSixFigs32Good(nn.Module):
                   + len(self.all_points_count_for_each_fig) * addable_count
 
         out_features = out_dim
-        layer_dims = [in_features, 256, 512, 1024]
+        layer_dims = [in_features, 256, 512]
         layers = []
         for i in range(len(layer_dims)-1):
             layers += [
