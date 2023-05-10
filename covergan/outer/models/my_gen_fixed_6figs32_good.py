@@ -71,7 +71,7 @@ class MyGeneratorFixedSixFigs32Good(nn.Module):
         for i in range(len(layer_dims)-1):
             layers += [
                 torch.nn.Linear(in_features=layer_dims[i], out_features=layer_dims[i + 1]),
-                nn.BatchNorm1d(layer_dims[i + 1]),
+                # nn.BatchNorm1d(layer_dims[i + 1]),
                 torch.nn.LeakyReLU(0.2, inplace=True),
             ]
         layers += [
