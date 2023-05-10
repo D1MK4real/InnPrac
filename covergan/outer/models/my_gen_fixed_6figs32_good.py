@@ -66,13 +66,13 @@ class MyGeneratorFixedSixFigs32Good(nn.Module):
                   + len(self.all_points_count_for_each_fig) * addable_count
 
         out_features = out_dim
-        layer_dims = [in_features, 256, 512]
+        layer_dims = [in_features, 256, 512, 1024]
         layers = []
         for i in range(len(layer_dims)-1):
             layers += [
                 torch.nn.Linear(in_features=layer_dims[i], out_features=layer_dims[i + 1]),
                 nn.BatchNorm1d(layer_dims[i + 1]),
-                torch.nn.LeakyReLU(0.2,inplace=True),
+                torch.nn.LeakyReLU(0.2, inplace=True),
             ]
         layers += [
             torch.nn.Linear(in_features=layer_dims[-1], out_features=out_features),
