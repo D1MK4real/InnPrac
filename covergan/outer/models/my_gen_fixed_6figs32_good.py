@@ -12,13 +12,13 @@ class MyGeneratorFixedSixFigs32Good(nn.Module):
     def __init__(self, z_dim: int, audio_embedding_dim: int, num_layers: int, canvas_size: int, max_stroke_width: float):
         super(MyGeneratorFixedSixFigs32Good, self).__init__()
         self.figs_config = [
+            init_func_types_config[InitFuncType.CIRCLE],
+            init_func_types_config[InitFuncType.CIRCLE],
+            init_func_types_config[InitFuncType.CIRCLE],
             init_func_types_config[InitFuncType.OVAL],
             init_func_types_config[InitFuncType.OVAL],
             init_func_types_config[InitFuncType.TRIANGLE],
             init_func_types_config[InitFuncType.TRIANGLE],
-            init_func_types_config[InitFuncType.CIRCLE],
-            init_func_types_config[InitFuncType.CIRCLE],
-            init_func_types_config[InitFuncType.CIRCLE],
         ]
         path_count = len(self.figs_config)
         self.path_depth = 4

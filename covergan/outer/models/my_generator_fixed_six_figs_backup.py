@@ -83,6 +83,7 @@ class MyGeneratorFixedSixFigs32(nn.Module):
             out_features = in_features - feature_step
             layers += [
                 torch.nn.Linear(in_features=in_features, out_features=out_features),
+
                 torch.nn.BatchNorm1d(num_features=out_features),
                 torch.nn.LeakyReLU(0.2)
             ]

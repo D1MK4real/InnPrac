@@ -214,7 +214,7 @@ class PaletteDataset(Dataset[Tuple[torch.Tensor, torch.Tensor]]):
         # else:
         #     result = music_tensor, palette_tensor
 
-        result = emotion_tensor, palette_tensor
+        result = emotion_tensor, palette_tensor/255
         if self.cache_ is not None:
             self.cache_[index] = result
 
@@ -344,8 +344,9 @@ class PaletteDatasetSmiles(Dataset[Tuple[torch.Tensor, torch.Tensor]]):
         #     # result = music_tensor, palette_tensor, emotions, f
         # else:
         #     result = music_tensor, palette_tensor
-
+        palette_tensor = palette_tensor/255
         result = emotion_tensor, palette_tensor
+
         if self.cache_ is not None:
             self.cache_[index] = result
 
@@ -459,7 +460,7 @@ class ImageDatasetSmiles(Dataset[Tuple[torch.Tensor, torch.Tensor]]):
 
         emotion_tensor = torch.Tensor(emotion_tensor)
 
-        result = emotion_tensor, torch.Tensor(np.array(image))
+        result = emotion_tensor, torch.Tensor(np.array(image)/255)
         # if self.cache_ is not None:
         #     self.cache_[index] = result
 
@@ -579,7 +580,7 @@ class ImageDataset(Dataset[Tuple[torch.Tensor, torch.Tensor]]):
             emotion_tensor[self.emotions[emotion]] = 1
         emotion_tensor = torch.Tensor(emotion_tensor)
 
-        result = emotion_tensor, torch.Tensor(image)
+        result = emotion_tensor, torch.Tensor(image)/255
         # if self.cache_ is not None:
         #     self.cache_[index] = result
 
