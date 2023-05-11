@@ -173,7 +173,6 @@ class MyGeneratorFixedSixFigs32Good(nn.Module):
         return cover
 
     def fwd_func(self, noise: torch.Tensor, audio_embedding: torch.Tensor):
-
         audio_embedding = self.emb(audio_embedding.argmax(dim=1))
         no_random_inp = audio_embedding
         if self.USE_ATTN:

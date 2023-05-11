@@ -38,7 +38,7 @@ def get_main_rgb_palette2(f_path: str, color_count: int, sort_colors=True):
 
 
 def image_file_to_palette(f: str, cover_dir: str, color_count: int, color_type: str = 'rgb',
-                          sorted_colors: bool = True,use_png = False):
+                          sorted_colors: bool = True, use_png=False):
     if use_png:
         cover_file = f'{cover_dir}/{f}'
     else:
@@ -66,9 +66,9 @@ def image_file_to_palette(f: str, cover_dir: str, color_count: int, color_type: 
         return palette
 
 
-
 def process_cover_to_palette(f: str, checkpoint_root: str, cover_dir: str, palette_count: int,
-                             color_type: str = 'rgb', sorted_colors: bool = True, num: int = None,use_png = False) -> torch.Tensor:
+                             color_type: str = 'rgb', sorted_colors: bool = True, num: int = None,
+                             use_png=False) -> torch.Tensor:
     palette_tensor_f = os.path.join(checkpoint_root, f + ".pt")
     if not os.path.isfile(palette_tensor_f):
         logger.info(f'No palette tensor for file #{num}: {f}, generating...')
@@ -95,7 +95,8 @@ class PaletteDataset(Dataset[Tuple[torch.Tensor, torch.Tensor]]):
                  is_for_train: bool = True, train_test_split_coef: float = 0.9, pandas_dir: str = '.'):
         self.color_type = 'rgb'
         self.data = pd.read_csv(pandas_dir)
-        self.emotions = dict(zip(self.data.emotion.unique(), self.data.index))
+        self.emotions = {'something else': -1, 'sadness': 1, 'contentment': 0, 'awe': 2, 'amusement': 0,
+                         'excitement': 0, 'fear': 3, 'disgust': 4, 'anger': 5}
         self.data = self.data.iloc[:count_images]
         self.data = self.data.groupby(['painting', 'art_style'])['emotion'].apply(lambda x: ','.join(x)).reset_index()
         # self.color_type = 'lab'
@@ -195,10 +196,13 @@ class PaletteDataset(Dataset[Tuple[torch.Tensor, torch.Tensor]]):
                                                   self.palette_count, num=index)
         emotions = self.data.iloc[index]['emotion']
 
-        emotion_tensor = np.zeros(9, dtype=np.float32)
+        emotion_tensor = np.zeros(6, dtype=np.float32)
 
         for emotion in emotions.split(','):
-            emotion_tensor[self.emotions[emotion]] = 1
+            if self.emotions[emotion] != -1:
+                emotion_tensor[self.emotions[emotion]] = 1
+                break
+
         emotion_tensor = torch.Tensor(emotion_tensor)
         # music_tensor = read_tensor_from_file(f, self.checkpoint_root_)
         # palette_tensor = read_tensor_from_file(replace_extension(f, ""), self.palette_checkpoint_root_)
@@ -214,7 +218,7 @@ class PaletteDataset(Dataset[Tuple[torch.Tensor, torch.Tensor]]):
         # else:
         #     result = music_tensor, palette_tensor
 
-        result = emotion_tensor, palette_tensor/255
+        result = emotion_tensor, palette_tensor / 255
         if self.cache_ is not None:
             self.cache_[index] = result
 
@@ -324,7 +328,7 @@ class PaletteDatasetSmiles(Dataset[Tuple[torch.Tensor, torch.Tensor]]):
         # cover_path = os.path.join(self.cover_dir_, art_style, name+'.jpg')
 
         palette_tensor = process_cover_to_palette(name, self.checkpoint_root_, self.cover_dir_,
-                                                  self.palette_count, num=index,use_png=True)
+                                                  self.palette_count, num=index, use_png=True)
         emotions = self.data.iloc[index]['label']
 
         emotion_tensor = np.zeros(7, dtype=np.float32)
@@ -344,7 +348,7 @@ class PaletteDatasetSmiles(Dataset[Tuple[torch.Tensor, torch.Tensor]]):
         #     # result = music_tensor, palette_tensor, emotions, f
         # else:
         #     result = music_tensor, palette_tensor
-        palette_tensor = palette_tensor/255
+        palette_tensor = palette_tensor / 255
         result = emotion_tensor, palette_tensor
 
         if self.cache_ is not None:
@@ -460,7 +464,7 @@ class ImageDatasetSmiles(Dataset[Tuple[torch.Tensor, torch.Tensor]]):
 
         emotion_tensor = torch.Tensor(emotion_tensor)
 
-        result = emotion_tensor, torch.Tensor(np.array(image)/255)
+        result = emotion_tensor, torch.Tensor(np.array(image) / 255)
         # if self.cache_ is not None:
         #     self.cache_[index] = result
 
@@ -477,7 +481,8 @@ class ImageDataset(Dataset[Tuple[torch.Tensor, torch.Tensor]]):
                  is_for_train: bool = True, train_test_split_coef: float = 0.9, pandas_dir: str = '.'):
         self.color_type = 'rgb'
         self.data = pd.read_csv(pandas_dir)
-        self.emotions = dict(zip(self.data.emotion.unique(), self.data.index))
+        self.emotions = {'something else': -1, 'sadness': 1, 'contentment': 0, 'awe': 2, 'amusement': 0,
+                         'excitement': 0, 'fear': 3, 'disgust': 4, 'anger': 5}
         self.data = self.data.iloc[:count_images]
         self.data = self.data.groupby(['painting', 'art_style'])['emotion'].apply(
             lambda x: ','.join(x)).reset_index()
@@ -575,12 +580,15 @@ class ImageDataset(Dataset[Tuple[torch.Tensor, torch.Tensor]]):
         image = cv2.resize(image, (128, 128))
         emotions = self.data.iloc[index]['emotion']
 
-        emotion_tensor = np.zeros(9, dtype=np.float32)
+        emotion_tensor = np.zeros(6, dtype=np.float32)
+
         for emotion in emotions.split(','):
-            emotion_tensor[self.emotions[emotion]] = 1
+            if self.emotions[emotion] != -1:
+                emotion_tensor[self.emotions[emotion]] = 1
+                break
         emotion_tensor = torch.Tensor(emotion_tensor)
 
-        result = emotion_tensor, torch.Tensor(image)/255
+        result = emotion_tensor, torch.Tensor(image) / 255
         # if self.cache_ is not None:
         #     self.cache_[index] = result
 
