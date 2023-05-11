@@ -12,13 +12,12 @@ class MyGeneratorFixedSixFigs32Good(nn.Module):
     def __init__(self, z_dim: int, audio_embedding_dim: int, num_layers: int, canvas_size: int, max_stroke_width: float):
         super(MyGeneratorFixedSixFigs32Good, self).__init__()
         self.figs_config = [
-            init_func_types_config[InitFuncType.CIRCLE],
-            init_func_types_config[InitFuncType.CIRCLE],
-            init_func_types_config[InitFuncType.CIRCLE],
-            init_func_types_config[InitFuncType.OVAL],
-            init_func_types_config[InitFuncType.OVAL],
+            init_func_types_config[InitFuncType.RECT],
             init_func_types_config[InitFuncType.TRIANGLE],
+            init_func_types_config[InitFuncType.RECT],
             init_func_types_config[InitFuncType.TRIANGLE],
+            init_func_types_config[InitFuncType.CIRCLE],
+            init_func_types_config[InitFuncType.PENTAGON],
         ]
         path_count = len(self.figs_config)
         self.path_depth = 4
@@ -71,7 +70,7 @@ class MyGeneratorFixedSixFigs32Good(nn.Module):
         for i in range(len(layer_dims)-1):
             layers += [
                 torch.nn.Linear(in_features=layer_dims[i], out_features=layer_dims[i + 1]),
-                # nn.BatchNorm1d(layer_dims[i + 1]),
+                nn.BatchNorm1d(layer_dims[i + 1]),
                 torch.nn.LeakyReLU(0.2, inplace=True),
             ]
         layers += [
@@ -199,7 +198,7 @@ class MyGeneratorFixedSixFigs32Good(nn.Module):
         result_covers = self.fwd_func(noise, audio_embedding)
         if palette_generator is not None:
             with torch.no_grad():
-                fwd = palette_generator(noise[:, :32], audio_embedding)
+                fwd = palette_generator(noise, audio_embedding)
                 predicted_palette = fwd.reshape(fwd.shape[0], -1, 3)
             for cover_ind, x in enumerate(result_covers):
                 x.colorize_cover(predicted_palette[cover_ind], use_triad=use_triad_coloring,
