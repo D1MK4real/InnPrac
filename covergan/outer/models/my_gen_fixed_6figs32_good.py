@@ -14,6 +14,8 @@ class MyGeneratorFixedSixFigs32Good(nn.Module):
         self.figs_config = [
             init_func_types_config[InitFuncType.RECT],
             init_func_types_config[InitFuncType.TRIANGLE],
+            init_func_types_config[InitFuncType.RECT],
+            init_func_types_config[InitFuncType.TRIANGLE],
             init_func_types_config[InitFuncType.CIRCLE],
             init_func_types_config[InitFuncType.PENTAGON],
         ]
