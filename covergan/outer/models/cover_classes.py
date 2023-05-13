@@ -54,7 +54,7 @@ class Cover:
             mean = idk[emotion.item()]
             colors = sps.norm(loc=mean, scale=0.3).rvs(size=(100, 3))
             colors = np.clip(colors, 0, 1)
-            colors = torch.Tensor(colors, device=emotion.device)
+            colors = torch.tensor(colors, device=emotion.device)
 
         if use_triad:
             device = colors.device
