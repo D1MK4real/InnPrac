@@ -22,8 +22,7 @@ class MyDiscriminator(torch.nn.Module):
 
         layers = [
             nn.Conv2d(3, 32, 3, 2, padding=1),
-            nn.LeakyReLU(0.2),
-            nn.Dropout(),
+            nn.ReLU(inplace=True),
             nn.Conv2d(32, 64, 3, 2, padding=1),
             nn.BatchNorm2d(64),
             nn.AdaptiveAvgPool2d(1),
