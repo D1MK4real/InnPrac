@@ -10,7 +10,7 @@ from ..svg_tools.svg_tools import *
 
 class MyGeneratorFixedSixFigs32Good(nn.Module):
     def __init__(self, z_dim: int, audio_embedding_dim: int, num_layers: int, canvas_size: int,
-                 max_stroke_width: float):
+                 max_stroke_width: float, NEED_STROKE:bool):
         super(MyGeneratorFixedSixFigs32Good, self).__init__()
         self.figs_config = [
             init_func_types_config[InitFuncType.RECT],
@@ -26,7 +26,7 @@ class MyGeneratorFixedSixFigs32Good(nn.Module):
         self.deform_coef = 0.25
 
         self.USE_ATTN = False
-        self.NEED_STROKE = True
+        self.NEED_STROKE = NEED_STROKE
         self.USE_PALETTE_PREDICTOR = True
 
         in_features = z_dim + audio_embedding_dim
