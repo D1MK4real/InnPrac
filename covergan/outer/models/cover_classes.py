@@ -1,7 +1,8 @@
 from typing import List
 
+import numpy as np
 import torch
-
+import scipy.stats as sps
 from outer.colors_tools import palette_to_triad_palette
 
 
@@ -31,7 +32,30 @@ class Cover:
     def add_figure(self, fig: CoverFigure):
         self.figures.append(fig)
 
-    def colorize_cover(self, colors, use_triad=False, need_stroke=False):
+    def colorize_cover(self, emotion, colors, use_default=True, use_triad=False, need_stroke=False):
+        if use_default:
+            #            colors = {0: 'smiling',
+            # 1: 'sad',
+            # 2: 'surprise',
+            # 3: 'fear',
+            # 4: 'disgust',
+            # 5: 'anger',
+            # 6: 'contempt'}
+
+            # {-1: 'something else',
+            #  1: 'sadness',
+            #  0: 'excitement',
+            #  2: 'awe',
+            #  3: 'fear',
+            #  4: 'disgust',
+            #  5: 'anger'}
+            idk = {1: [0., 0., 1.], 0: [1., 1., 0.], 2: [1., 165 / 255, 0.], 3: [0., 1 / 2, 0.],
+                   4: [139 / 255, 0., 1.], 5: [1., 0., 0.]}
+            mean = idk[emotion.item()]
+            colors = sps.norm(loc=mean, scale=0.3).rvs(size=(100, 3))
+            colors = np.clip(colors, 0, 1)
+            colors = torch.tensor(colors, device=emotion.device)
+
         if use_triad:
             device = colors.device
             colors = colors.detach().cpu().numpy()[None, :]

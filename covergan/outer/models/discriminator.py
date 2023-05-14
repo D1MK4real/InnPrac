@@ -45,9 +45,9 @@ class Discriminator(torch.nn.Module):
         # out_channels //= 2  # Output channels of the last Conv2d
         # img_dim = out_channels * (ds_size ** 2)
 
-        in_features = layers[-3].out_channels + audio_embedding_dim
+        # in_features = layers[-3].out_channels + audio_embedding_dim
         layers = [
-            nn.Linear(in_features=in_features, out_features=1),
+            nn.Linear(in_features=32+audio_embedding_dim, out_features=1),
             nn.Sigmoid()
         ]
         self.adv_layer = torch.nn.Sequential(*layers)

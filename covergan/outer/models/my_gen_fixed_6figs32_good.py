@@ -1,5 +1,6 @@
 from typing import *
 
+import torch.nn
 from torch import nn
 
 from .cover_classes import *
@@ -8,16 +9,16 @@ from ..svg_tools.svg_tools import *
 
 
 class MyGeneratorFixedSixFigs32Good(nn.Module):
-    def __init__(self, z_dim: int, audio_embedding_dim: int, num_layers: int, canvas_size: int, max_stroke_width: float):
+    def __init__(self, z_dim: int, audio_embedding_dim: int, num_layers: int, canvas_size: int,
+                 max_stroke_width: float):
         super(MyGeneratorFixedSixFigs32Good, self).__init__()
         self.figs_config = [
-            init_func_types_config[InitFuncType.OVAL],
-            init_func_types_config[InitFuncType.OVAL],
+            init_func_types_config[InitFuncType.RECT],
             init_func_types_config[InitFuncType.TRIANGLE],
+            init_func_types_config[InitFuncType.RECT],
             init_func_types_config[InitFuncType.TRIANGLE],
             init_func_types_config[InitFuncType.CIRCLE],
-            init_func_types_config[InitFuncType.CIRCLE],
-            init_func_types_config[InitFuncType.CIRCLE],
+            init_func_types_config[InitFuncType.PENTAGON],
         ]
         path_count = len(self.figs_config)
         self.path_depth = 4
@@ -25,7 +26,7 @@ class MyGeneratorFixedSixFigs32Good(nn.Module):
         self.deform_coef = 0.25
 
         self.USE_ATTN = False
-        self.NEED_STROKE = False
+        self.NEED_STROKE = True
         self.USE_PALETTE_PREDICTOR = True
 
         in_features = z_dim + audio_embedding_dim
@@ -67,14 +68,15 @@ class MyGeneratorFixedSixFigs32Good(nn.Module):
         out_features = out_dim
         layer_dims = [in_features, 256, 512, 1024]
         layers = []
-        for i in range(len(layer_dims)-1):
+        for i in range(len(layer_dims) - 1):
             layers += [
                 torch.nn.Linear(in_features=layer_dims[i], out_features=layer_dims[i + 1]),
-                torch.nn.LeakyReLU(0.2),
+                nn.BatchNorm1d(layer_dims[i + 1]),
+                torch.nn.LeakyReLU(0.2, inplace=True),
             ]
         layers += [
             torch.nn.Linear(in_features=layer_dims[-1], out_features=out_features),
-            torch.nn.Sigmoid()
+            torch.nn.Tanh()
         ]
         my_layers = layers
 
@@ -174,7 +176,6 @@ class MyGeneratorFixedSixFigs32Good(nn.Module):
         return cover
 
     def fwd_func(self, noise: torch.Tensor, audio_embedding: torch.Tensor):
-
         audio_embedding = self.emb(audio_embedding.argmax(dim=1))
         no_random_inp = audio_embedding
         if self.USE_ATTN:
@@ -189,7 +190,7 @@ class MyGeneratorFixedSixFigs32Good(nn.Module):
                 return_psvg=False, return_diffvg_svg_params=False,
                 use_triad_coloring=False,
                 palette_generator=None,
-                return_as_SVGCont=False):
+                return_as_SVGCont=False, use_default=True):
         if self.USE_PALETTE_PREDICTOR:
             if palette_generator is None:
                 raise Exception("Palette generator expected!")
@@ -197,11 +198,12 @@ class MyGeneratorFixedSixFigs32Good(nn.Module):
         result_covers = self.fwd_func(noise, audio_embedding)
         if palette_generator is not None:
             with torch.no_grad():
-                fwd = palette_generator(noise[:, :32], audio_embedding)
+                fwd = palette_generator(noise, audio_embedding)
                 predicted_palette = fwd.reshape(fwd.shape[0], -1, 3)
             for cover_ind, x in enumerate(result_covers):
-                x.colorize_cover(predicted_palette[cover_ind], use_triad=use_triad_coloring,
-                                 need_stroke=self.NEED_STROKE)
+                x.colorize_cover(audio_embedding.argmax(dim=1)[cover_ind], predicted_palette[cover_ind],
+                                 use_triad=use_triad_coloring,
+                                 need_stroke=self.NEED_STROKE, use_default=use_default)
 
         if return_as_SVGCont:
             result = []
